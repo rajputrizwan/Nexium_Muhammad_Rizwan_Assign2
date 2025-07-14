@@ -26,7 +26,7 @@ A modern web application that uses AI to summarize blog content. Built with [Nex
 1. **Clone the repository:**
 
    ```sh
-   git clone <your-repo-url>
+   git clone https://github.com/rajputrizwan/Nexium_Muhammad_Rizwan_Assign2.git
    cd Nexium_Muhammad_Rizwan_Assign2
    ```
 
