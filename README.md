@@ -92,10 +92,6 @@ A modern web application that uses AI to summarize blog content. Built with [Nex
 - Update the n8n workflow or Gemini API key as needed in `blog-summarizer.json`.
 - Adjust database URIs in `.env.local`.
 
-## License
-
-MIT
-
 ---
 
 **Made with ❤️ using Next.js, Prisma, MongoDB, PostgreSQL, and n8n**
