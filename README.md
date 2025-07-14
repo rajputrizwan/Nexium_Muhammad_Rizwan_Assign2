@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Blog Summarizer
+
+A modern web application that uses AI to summarize blog content. Built with [Next.js](https://nextjs.org/), [Prisma](https://www.prisma.io/), [MongoDB](https://www.mongodb.com/) (for summaries), [PostgreSQL](https://www.postgresql.org/) (for users), and [n8n](https://n8n.io/) for AI integration via the Gemini API.
+
+## Features
+
+- Paste any blog content and get an AI-generated summary.
+- Animated summary reveal for better UX.
+- Copy summary to clipboard with one click.
+- Dark/light theme toggle.
+- Summaries are saved to the database.
+- Built with modern UI components ([shadcn/ui](https://ui.shadcn.com/)), [Tailwind CSS](https://tailwindcss.com/), and [Framer Motion](https://www.framer.com/motion/).
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v18+ recommended)
+- [pnpm](https://pnpm.io/) (or npm/yarn)
+- MongoDB instance (for summaries)
+- PostgreSQL instance (for users)
+- [n8n](https://n8n.io/) running the provided workflow
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the repository:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```sh
+   git clone <your-repo-url>
+   cd Nexium_Muhammad_Rizwan_Assign2
+   ```
 
-## Learn More
+2. **Install dependencies:**
 
-To learn more about Next.js, take a look at the following resources:
+   ```sh
+   pnpm install
+   # or
+   npm install
+   # or
+   yarn install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configure environment variables:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   Create a `.env.local` file with the following (adjust as needed):
 
-## Deploy on Vercel
+   ```
+   MONGODB_URI=mongodb://localhost:27017/blog-summarizer
+   DATABASE_URL=postgresql://user:password@localhost:5432/blog-summarizer
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Set up Prisma:**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```sh
+   npx prisma generate
+   npx prisma migrate dev
+   ```
+
+5. **Run the development server:**
+
+   ```sh
+   pnpm dev
+   # or
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+6. **Start n8n and import the workflow in `blog-summarizer.json`.**
+
+7. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
+
+## Project Structure
+
+- `src/app/` – Next.js app directory (pages, layout, providers)
+- `src/components/` – UI and feature components
+- `src/lib/` – Database and utility functions
+- `src/hooks/` – Custom React hooks
+- `prisma/` – Prisma schema for PostgreSQL (users)
+- `blog-summarizer.json` – n8n workflow for AI summarization
+
+## How It Works
+
+1. User pastes blog content and clicks "Summarize".
+2. The app sends the content to an n8n webhook.
+3. n8n calls the Gemini API to generate a summary.
+4. The summary is returned and saved to MongoDB.
+5. The summary is displayed with an animated typing effect.
+
+## Customization
+
+- Update the n8n workflow or Gemini API key as needed in `blog-summarizer.json`.
+- Adjust database URIs in `.env.local`.
+
+## License
+
+MIT
+
+---
+
+**Made with ❤️ using Next.js, Prisma, MongoDB, PostgreSQL, and n8n**
