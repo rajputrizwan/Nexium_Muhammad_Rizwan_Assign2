@@ -1,0 +1,114 @@
+{
+  "name": "blog-summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog-summarizer",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        60
+      ],
+      "id": "ec006a7b-f09f-41ec-acfb-c6539603b97e",
+      "webhookId": "b8c2b482-48f2-4bc5-9378-e82c35833570"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Summarize this blog:\\nThis is a sample blog about AI.\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "headerParametersJson": "={\"Content-Type\": \"application/json\", \"x-goog-api-key\": \"AIzaSyBIgShFMwuRQiGFGBPrnOloe4kDRn9rVa0\"}"
+      },
+      "name": "Call Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        440,
+        60
+      ],
+      "id": "c96a1107-bfd6-476c-a5a2-2fae9ce18fc8"
+    },
+    {
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const candidates = $json.candidates;\n\nif (!candidates || candidates.length === 0) {\n  return [{ json: { summary: \"No summary returned.\" } }];\n}\n\nconst summary = candidates[0].content.parts[0].text;\n\nreturn [{ json: { summary } }];\n"
+      },
+      "name": "Extract Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        640,
+        60
+      ],
+      "id": "8cb7ed66-41d8-4276-9f35-cb72064bce6f"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        840,
+        60
+      ],
+      "id": "6741d302-0a85-4d72-bf0a-5ec629b2843f"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Gemini": {
+      "main": [
+        [
+          {
+            "node": "Extract Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Summary": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f007a855-c880-4efc-93ad-3278bf9cf907",
+  "meta": {
+    "instanceId": "acafd697c209a56d24a258adffec1b73a549f6c8dddf60a2d68b2c7ce269b85c"
+  },
+  "id": "ADi0RSWICcqZvx6t",
+  "tags": []
+}
