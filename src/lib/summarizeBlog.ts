@@ -1,45 +1,31 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export const summarizeBlog = async (
-  text: string,
-  userId?: string
-): Promise<string> => {
-  const webhookURL = "http://localhost:5678/webhook-test/blog-summarizer";
-
-  // Show persistent loading toast
-  const toastId = toast.loading("Sending to n8n webhook...", {
+export const summarizeBlog = async (text: string): Promise<string> => {
+  // Show loading toast while description is being generated
+  const toastId = toast.loading("Generating production description...", {
     duration: Infinity,
   });
 
   try {
-    const res = await axios.post(webhookURL, { text });
+    // Send request to your backend API route
+    const res = await axios.post("/api/summary", { text });
 
+    // Check for valid response
     if (!res.data?.summary || typeof res.data.summary !== "string") {
-      throw new Error("Summary not found in response");
+      throw new Error("No description returned");
     }
 
-    const summary = res.data.summary;
-
-    // Save the summary in your database
-    await axios.post("/api/summary", {
-      text,
-      summary,
-      userId,
-    });
-
-    // Dismiss loading and show success
+    // Success: dismiss loading toast and show success
     toast.dismiss(toastId);
-    toast.success("Summary received successfully!", { duration: 6000 });
+    toast.success("Description generated successfully");
 
-    return summary;
+    return res.data.summary;
   } catch (error) {
-    console.error("Error summarizing blog:", error);
-
-    // Dismiss loading and show error
+    // Error: dismiss loading toast and show error toast
+    console.error("Error generating description:", error);
     toast.dismiss(toastId);
-    toast.error("Webhook call failed. Please try again.", { duration: 8000 });
-
+    toast.error("Failed to generate description");
     throw error;
   }
 };
