@@ -2,8 +2,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 export const summarizeBlog = async (text: string): Promise<string> => {
-  // Show loading toast while description is being generated
-  const toastId = toast.loading("Generating production description...", {
+  // Show loading toast while summary is being generated
+  const toastId = toast.loading("Generating summary...", {
     duration: Infinity,
   });
 
@@ -13,19 +13,19 @@ export const summarizeBlog = async (text: string): Promise<string> => {
 
     // Check for valid response
     if (!res.data?.summary || typeof res.data.summary !== "string") {
-      throw new Error("No description returned");
+      throw new Error("No summary returned");
     }
 
     // Success: dismiss loading toast and show success
     toast.dismiss(toastId);
-    toast.success("Description generated successfully");
+    toast.success("Summary generated successfully");
 
     return res.data.summary;
   } catch (error) {
     // Error: dismiss loading toast and show error toast
-    console.error("Error generating description:", error);
+    console.error("Error generating summary:", error);
     toast.dismiss(toastId);
-    toast.error("Failed to generate description");
+    toast.error("Failed to generate summary");
     throw error;
   }
 };
