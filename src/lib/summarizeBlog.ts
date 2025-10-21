@@ -1,31 +1,58 @@
-import axios from "axios";
+// lib/summarizeBlog.ts
+import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 
 export const summarizeBlog = async (text: string): Promise<string> => {
-  // Show loading toast while summary is being generated
   const toastId = toast.loading("Generating summary...", {
     duration: Infinity,
   });
 
   try {
-    // Send request to your backend API route
-    const res = await axios.post("/api/summary", { text });
+    const res = await axios.post("/api/summary", { blogText: text });
 
-    // Check for valid response
-    if (!res.data?.summary || typeof res.data.summary !== "string") {
-      throw new Error("No summary returned");
+    console.log("API Response:", res.data); // Debug log
+
+    const responseData = res.data;
+
+    // Check if we have a valid summary in the response
+    if (
+      responseData &&
+      responseData.summary &&
+      typeof responseData.summary === "string"
+    ) {
+      const summary = responseData.summary;
+
+      toast.dismiss(toastId);
+      toast.success("Summary generated successfully");
+
+      return summary;
+    } else {
+      const errorMessage =
+        responseData?.error || "No summary returned from API";
+      throw new Error(errorMessage);
+    }
+  } catch (error: unknown) {
+    toast.dismiss(toastId);
+
+    // Handle AxiosError specifically
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<{ error?: string }>;
+      console.error("Error generating summary:", axiosError);
+      if (axiosError.response?.data?.error) {
+        toast.error(`Failed: ${axiosError.response.data.error}`);
+      } else if (axiosError.message) {
+        toast.error(`Failed: ${axiosError.message}`);
+      } else {
+        toast.error("Failed to generate summary");
+      }
+    } else if (error instanceof Error) {
+      console.error("Error generating summary:", error.message);
+      toast.error(`Failed: ${error.message}`);
+    } else {
+      console.error("Error generating summary:", error);
+      toast.error("Failed to generate summary");
     }
 
-    // Success: dismiss loading toast and show success
-    toast.dismiss(toastId);
-    toast.success("Summary generated successfully");
-
-    return res.data.summary;
-  } catch (error) {
-    // Error: dismiss loading toast and show error toast
-    console.error("Error generating summary:", error);
-    toast.dismiss(toastId);
-    toast.error("Failed to generate summary");
     throw error;
   }
 };
