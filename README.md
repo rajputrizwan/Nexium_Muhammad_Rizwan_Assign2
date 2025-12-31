@@ -1,6 +1,6 @@
 # Blog Summarizer
 
-A modern web application that uses AI to summarize blog content. Built with [Next.js](https://nextjs.org/), [Prisma](https://www.prisma.io/), [MongoDB](https://www.mongodb.com/) (for summaries), [PostgreSQL](https://www.postgresql.org/) (for users), and [n8n](https://n8n.io/) for AI integration via the Gemini API.
+A modern web application that uses AI to summarize blog content. Built with [Next.js](https://nextjs.org/), [MongoDB](https://www.mongodb.com/) for data persistence, [Mongoose](https://mongoosejs.com/) for database modeling, and [OpenRouter API](https://openrouter.ai/) for AI-powered summarization using the Mistral 7B model.
 
 ## Features
 
@@ -17,9 +17,8 @@ A modern web application that uses AI to summarize blog content. Built with [Nex
 
 - Node.js (v18+ recommended)
 - [pnpm](https://pnpm.io/) (or npm/yarn)
-- MongoDB instance (for summaries)
-- PostgreSQL instance (for users)
-- [n8n](https://n8n.io/) running the provided workflow
+- MongoDB instance (local or cloud-based like MongoDB Atlas)
+- [OpenRouter API](https://openrouter.ai/) account with API key
 
 ### Installation
 
@@ -46,17 +45,15 @@ A modern web application that uses AI to summarize blog content. Built with [Nex
 
    ```
    MONGODB_URI=mongodb://localhost:27017/blog-summarizer
-   DATABASE_URL=postgresql://user:password@localhost:5432/blog-summarizer
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
    ```
+   
+   To get your OpenRouter API key:
+   - Visit [OpenRouter](https://openrouter.ai/)
+   - Sign up or log in
+   - Navigate to the API keys section and create a new key
 
-4. **Set up Prisma:**
-
-   ```sh
-   npx prisma generate
-   npx prisma migrate dev
-   ```
-
-5. **Run the development server:**
+4. **Run the development server:**
 
    ```sh
    pnpm dev
@@ -66,32 +63,42 @@ A modern web application that uses AI to summarize blog content. Built with [Nex
    yarn dev
    ```
 
-6. **Start n8n and import the workflow in `blog-summarizer.json`.**
-
-7. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
+5. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
 ## Project Structure
 
-- `src/app/` – Next.js app directory (pages, layout, providers)
-- `src/components/` – UI and feature components
-- `src/lib/` – Database and utility functions
+- `src/app/` – Next.js app directory with API routes and main layout
+  - `api/summary/` – API endpoint for blog summarization
+  - `layout.tsx` – Root layout with theme provider
+  - `page.tsx` – Main application page
+- `src/components/` – Reusable UI components
+  - `SummaryCard.tsx` – Component displaying summary with typing effect
+  - `theme-toggle.tsx` – Dark/light mode switcher
+- `src/lib/` – Core utility functions
+  - `mongoose.ts` – MongoDB connection and model setup
+  - `summarizeBlog.ts` – AI summarization logic using OpenRouter
+  - `models/` – Mongoose data models
 - `src/hooks/` – Custom React hooks
-- `prisma/` – Prisma schema for PostgreSQL (users)
-- `blog-summarizer.json` – n8n workflow for AI summarization
+  - `useTypingEffect.ts` – Animation hook for typing effect
+- `src/services/` – Service utilities
+  - `constants.ts` – API and configuration constants
 
 ## How It Works
 
-1. User pastes blog content and clicks "Summarize".
-2. The app sends the content to an n8n webhook.
-3. n8n calls the Gemini API to generate a summary.
-4. The summary is returned and saved to MongoDB.
-5. The summary is displayed with an animated typing effect.
+1. User pastes blog content (50-8000 characters) into the input field and clicks "Summarize".
+2. The app validates the content length and sends it to the `/api/summary` endpoint.
+3. The backend calls the OpenRouter API, which uses the Mistral 7B model for summarization.
+4. The generated summary is saved to MongoDB with metadata (original content, timestamp).
+5. The summary is returned to the frontend and displayed with a smooth typing animation effect.
+6. Users can copy the summary to clipboard or modify the input to generate new summaries.
 
 ## Customization
 
-- Update the n8n workflow or Gemini API key as needed in `blog-summarizer.json`.
-- Adjust database URIs in `.env.local`.
+- **Change AI Model:** Modify the model selection in `src/lib/summarizeBlog.ts` to use different OpenRouter-supported models (Claude, GPT-4, etc.)
+- **Database Configuration:** Update `MONGODB_URI` in `.env.local` to use your MongoDB instance
+- **Content Limits:** Adjust min/max character limits in the API route `src/app/api/summary/route.ts`
+- **Styling:** Customize theme colors and components in `src/components/` and `src/app/globals.css`
 
 ---
 
-**Made with ❤️ using Next.js, Prisma, MongoDB, PostgreSQL, and n8n**
+**Made with ❤️ using Next.js, MongoDB, Mongoose, OpenRouter AI, and React**
